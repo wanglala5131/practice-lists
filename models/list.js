@@ -11,6 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      List.belongsTo(models.User)
+      List.belongsToMany(models.Item, {
+        through: models.ListItem,
+        foreignKey: 'ListId',
+        as: 'Items'
+      })
     }
   };
   List.init({

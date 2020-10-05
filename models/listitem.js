@@ -14,7 +14,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   ListItem.init({
-    userId: DataTypes.INTEGER,
     listId: DataTypes.INTEGER,
     itemId: DataTypes.INTEGER,
     reps: DataTypes.STRING,

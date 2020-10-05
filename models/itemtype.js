@@ -14,7 +14,6 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
   ItemType.init({
-    userId: DataTypes.INTEGER,
     subcategoryId: DataTypes.INTEGER,
     itemId: DataTypes.INTEGER
   }, {
