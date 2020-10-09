@@ -1,6 +1,5 @@
-const itemController = require('../controllers/api/itemController')
+let apis = require('./api')
 
-module.exports = app => {
-  app.get('/', (req, res) => res.redirect('/practice'))
-  app.get('/practice', itemController.getItems)
+module.exports = (app) => {
+  app.use('/api', apis)
 }
