@@ -12,7 +12,7 @@ const authenticated = passport.authenticate('jwt', { session: false })
 router.post('/signin', userController.signIn)
 router.get('/user/current', authenticated, userController.currentUser)
 
-router.get('/', (req, res) => res.redirect('/practice'))
-router.get('/practice', itemController.getItems)
+router.get('/', (req, res) => res.redirect('/api/practice'))
+router.get('/practice', authenticated, itemController.getItems)
 
 module.exports = router

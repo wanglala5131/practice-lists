@@ -92,6 +92,14 @@ module.exports = {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      {
+        id: 6,
+        name: '2號',
+        userId: 2,
+        CategoryId: 3,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     ], {})
     await queryInterface.bulkInsert('Items', [
       {
@@ -114,6 +122,18 @@ module.exports = {
         UserId: 1,
         CategoryId: 2,
         limit: '一組至少要3個人，但也別一組太多人',
+        isClosed: false,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        id: 3,
+        name: 'user2',
+        description: 'user2',
+        image: '',
+        UserId: 2,
+        CategoryId: 3,
+        limit: 'user2',
         isClosed: false,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -146,6 +166,12 @@ module.exports = {
       },
       {
         itemId: 2,
+        subcategoryId: 4,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        itemId: 3,
         subcategoryId: 4,
         createdAt: new Date(),
         updatedAt: new Date(),
