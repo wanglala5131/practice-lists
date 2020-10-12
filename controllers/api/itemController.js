@@ -64,6 +64,23 @@ const itemController = {
     catch (err) {
       res.json(err)
     }
+  },
+  deleteItem: async (req, res) => {
+    try {
+      const ItemId = req.params.id
+      const deleteItem = await Item.findByPk(ItemId)
+      await deleteItem.destroy()
+      const deleteItemTypeArr = await ItemType.findAll({
+        where: { ItemId }
+      })
+      for (let deleteItemType of deleteItemTypeArr) {
+        await deleteItemType.destroy()
+      }
+      return res.json({ status: 'success' })
+    }
+    catch (err) {
+      res.json(err)
+    }
   }
 }
 
