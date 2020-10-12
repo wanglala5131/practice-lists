@@ -51,6 +51,19 @@ const itemController = {
     } catch (err) {
       return res.json(err)
     }
+  },
+  closeItem: async (req, res) => {
+    try {
+      const ItemId = req.params.id
+      const putItem = await Item.findByPk(ItemId)
+      await putItem.update({
+        isClosed: !putItem.isClosed
+      })
+      res.json({ status: 'success' })
+    }
+    catch (err) {
+      res.json(err)
+    }
   }
 }
 

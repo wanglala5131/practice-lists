@@ -11,7 +11,6 @@ const JwtStrategy = passportJWT.Strategy
 
 const userController = {
   signIn: (req, res) => {
-    console.log(req)
     // 檢查必要資料
     if (!req.body.email || !req.body.password) {
       return res.json({ status: 'error', message: "required fields didn't exist" })
