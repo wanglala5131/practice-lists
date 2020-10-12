@@ -52,6 +52,62 @@ const itemController = {
       return res.json(err)
     }
   },
+  putItem: async (req, res) => {
+    try {
+      const ItemId = req.params.id
+      const putItem = await Item.findByPk(ItemId, {
+        include: [{ model: Subcategory, as: 'Subcategories' }]
+      })
+      const { name, description, image, CategoryId, subcategories, limit } = req.body
+      if (!name || !CategoryId || subcategories.length === 0) {
+        return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
+      }
+      await putItem.update({
+        name, description, image, CategoryId, limit
+      })
+
+      //處理Subcategory  
+      const newSubArr = subcategories.map(Number)
+      const oriSubArr = []
+      for (let subcategory of putItem.Subcategories) {
+        await oriSubArr.push(subcategory.id)
+      }
+      const addSubArr = newSubArr.filter((subcategoryId) => {
+        if (!oriSubArr.includes(subcategoryId)) {
+          return subcategoryId
+        }
+      })
+      const deleteSubArr = oriSubArr.filter((subcategoryId) => {
+        if (!newSubArr.includes(subcategoryId)) {
+          return subcategoryId
+        }
+      })
+      //新增subcategory
+      if (addSubArr.length !== 0) {
+        for (let subcategoryId of addSubArr) {
+          ItemType.create({
+            ItemId,
+            SubcategoryId: subcategoryId
+          })
+        }
+      }
+      //刪除subcategory
+      if (deleteSubArr.length !== 0) {
+        for (let subcategoryId of deleteSubArr) {
+          const deleteItemType = await ItemType.findAll({
+            where: {
+              ItemId,
+              SubcategoryId: subcategoryId
+            }
+          })
+          await deleteItemType[0].destroy()
+        }
+      }
+      res.json({ status: 'success' })
+    } catch (err) {
+      res.json(err)
+    }
+  },
   closeItem: async (req, res) => {
     try {
       const ItemId = req.params.id
