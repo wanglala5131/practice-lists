@@ -14,5 +14,6 @@ router.get('/user/current', authenticated, userController.currentUser)
 
 router.get('/', (req, res) => res.redirect('/api/practice'))
 router.get('/practice', authenticated, itemController.getItems)
+router.post('/practice/item', authenticated, itemController.addItem)
 
 module.exports = router
