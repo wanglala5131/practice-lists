@@ -7,7 +7,6 @@ const ItemType = db.ItemType
 const itemController = {
   getItems: async (req, res) => {
     try {
-
       const userId = req.user.id
       const items = await Item.findAll({
         where: {
@@ -22,6 +21,20 @@ const itemController = {
     }
     catch (err) {
       return res.json(err)
+    }
+  },
+  getItem: async (req, res) => {
+    try {
+      const ItemId = req.params.id
+      const item = await Item.findByPk(ItemId, {
+        include: [
+          Category,
+          { model: Subcategory, as: 'Subcategories' }
+        ]
+      })
+      return res.json({ status: 'success', item })
+    } catch (err) {
+      console.log(err)
     }
   },
   addItem: async (req, res) => {
