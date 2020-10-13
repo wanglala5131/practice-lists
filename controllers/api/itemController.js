@@ -3,6 +3,7 @@ const Item = db.Item
 const Subcategory = db.Subcategory
 const Category = db.Category
 const ItemType = db.ItemType
+const fs = require('fs')
 
 const itemController = {
   getItems: async (req, res) => {
@@ -40,27 +41,53 @@ const itemController = {
   addItem: async (req, res) => {
     try {
       const UserId = req.user.id
-      const { name, description, image, CategoryId, subcategories, limit } = req.body
+      const { name, description, CategoryId, subcategories, limit } = req.body
       if (!name || !CategoryId || subcategories.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
-      const newItem = await Item.create({
-        name,
-        description,
-        image,
-        CategoryId,
-        limit,
-        UserId,
-        isClosed: false
-      })
-      const ItemId = await newItem.id
-      for (let subcategory of subcategories) {
-        await ItemType.create({
-          ItemId,
-          SubcategoryId: Number(subcategory)
+      const { file } = req
+      if (file) {
+        fs.readFile(file.path, (err, data) => {
+          if (err) { return res.json({ message: 'error' }) }
+          fs.writeFile(`upload/${file.originalname}`, data, async () => {
+            const newItem = await Item.create({
+              name,
+              description,
+              image: `/upload/${file.originalname}`,
+              CategoryId,
+              limit,
+              UserId,
+              isClosed: false
+            })
+            const ItemId = await newItem.id
+            for (let subcategory of subcategories) {
+              await ItemType.create({
+                ItemId,
+                SubcategoryId: Number(subcategory)
+              })
+            }
+            return res.json({ newItem })
+          })
         })
+      } else {
+        const newItem = await Item.create({
+          name,
+          description,
+          image: null,
+          CategoryId,
+          limit,
+          UserId,
+          isClosed: false
+        })
+        const ItemId = await newItem.id
+        for (let subcategory of subcategories) {
+          await ItemType.create({
+            ItemId,
+            SubcategoryId: Number(subcategory)
+          })
+        }
+        return res.json({ newItem })
       }
-      return res.json({ newItem })
     } catch (err) {
       return res.json(err)
     }
@@ -71,14 +98,36 @@ const itemController = {
       const putItem = await Item.findByPk(ItemId, {
         include: [{ model: Subcategory, as: 'Subcategories' }]
       })
-      const { name, description, image, CategoryId, subcategories, limit } = req.body
+      const { name, description, CategoryId, subcategories, limit } = req.body
       if (!name || !CategoryId || subcategories.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
-      await putItem.update({
-        name, description, image, CategoryId, limit
-      })
-
+      const { file } = req
+      if (file) {
+        fs.readFile(file.path, async (err, data) => {
+          try {
+            if (err) { return res.json({ message: 'error' }) }
+            await fs.writeFile(`upload/${file.originalname}`, data, () => {
+              putItem.update({
+                name,
+                description,
+                image: `/upload/${file.originalname}`,
+                CategoryId,
+                limit,
+              })
+            })
+          } catch (err) {
+            return res.json(err)
+          }
+        })
+      } else {
+        await putItem.update({
+          name,
+          description,
+          CategoryId,
+          limit,
+        })
+      }
       //處理Subcategory  
       const newSubArr = subcategories.map(Number)
       const oriSubArr = []
