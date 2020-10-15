@@ -10,38 +10,50 @@ const ExtractJwt = passportJWT.ExtractJwt
 const JwtStrategy = passportJWT.Strategy
 
 const userController = {
-  signIn: (req, res) => {
+  signIn: async (req, res) => {
     // 檢查必要資料
     if (!req.body.email || !req.body.password) {
       return res.json({ status: 'error', message: "required fields didn't exist" })
     }
     // 檢查 user 是否存在與密碼是否正確
-    let username = req.body.email
-    let password = req.body.password
+    const { email, password } = req.body
 
-    User.findOne({ where: { email: username } }).then(user => {
-      if (!user) return res.status(401).json({ status: 'error', message: 'no such user found' })
-      if (!bcrypt.compareSync(password, user.password)) {
-        return res.status(401).json({ status: 'error', message: 'passwords did not match' })
+    const user = await User.findOne({ where: { email } })
+    if (!user) return res.status(401).json({ status: 'error', message: 'no such user found' })
+    if (!bcrypt.compareSync(password, user.password)) {
+      return res.status(401).json({ status: 'error', message: 'passwords did not match' })
+    }
+    // 簽發 token
+    let payload = { id: user.id }
+    let token = await jwt.sign(payload, process.env.JWT_SECRET)
+    return res.json({
+      status: 'success',
+      token,
+      user: {
+        id: user.id, name: user.name, email: user.email
       }
-
-      // 簽發 token
-      var payload = { id: user.id }
-      var token = jwt.sign(payload, process.env.JWT_SECRET)
-      return res.json({
-        status: 'success',
-        message: 'ok',
-        token: token,
-        user: {
-          id: user.id, name: user.name, email: user.email
-        }
-      })
     })
+  },
+  signUp: async (req, res) => {
+    const { name, email, password } = req.body
+    const user = await User.findOne({ where: { email } })
+    if (!name || !email || !password) {
+      return res.json({ status: 'error', message: '請輸入完整資訊' })
+    }
+    if (user) {
+      return res.json({ status: 'error', message: '此電子信箱已被註冊' })
+    }
+    await User.create({
+      name,
+      email,
+      password: bcrypt.hashSync(password, bcrypt.genSaltSync(10))
+    })
+    return res.json({ status: 'success' })
   },
   currentUser: (req, res) => {
     const { id, name, email } = req.user
     return res.json({ id, name, email })
-  }
+  },
 
 }
 
