@@ -74,6 +74,21 @@ const settingController = {
     } catch (err) {
       return res.json(err)
     }
+  },
+  getCategories: async (req, res) => {
+    try {
+      const categories = await Category.findAll({
+        where: {
+          UserId: req.user.id
+        },
+        include: [
+          Subcategory
+        ]
+      })
+      return res.json(categories)
+    } catch (err) {
+      return res.json(err)
+    }
   }
 }
 
