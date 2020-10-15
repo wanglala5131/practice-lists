@@ -30,6 +30,9 @@ const settingController = {
   addSubcategory: async (req, res) => {
     try {
       const { name, CategoryId } = req.body
+      if (!name || !CategoryId) {
+        return res.json({ status: 'error', message: '請填入資訊' })
+      }
       const newSubcategory = await Subcategory.create({
         name,
         CategoryId,
@@ -42,8 +45,8 @@ const settingController = {
   },
   deleteSubcategory: async (req, res) => {
     try {
-      const { id: SubcategoryId } = req.params
-      const deleteSubcategory = await Subcategory.findByPk(SubcategoryId, {
+      const { id } = req.params
+      const deleteSubcategory = await Subcategory.findByPk(id, {
         include: [
           { model: Item, as: 'Items' }
         ]
@@ -61,7 +64,7 @@ const settingController = {
   putSubcategory: async (req, res) => {
     try {
       const { id } = req.params
-      const { subcategoryName: name, CategoryId } = req.body
+      const { name, CategoryId } = req.body
       const putSubcategory = await Subcategory.findByPk(id)
       if (!name || !CategoryId) {
         return res.json({ status: 'error', message: '請填入資訊' })
@@ -86,6 +89,21 @@ const settingController = {
         ]
       })
       return res.json(categories)
+    } catch (err) {
+      return res.json(err)
+    }
+  },
+  addCategory: async (req, res) => {
+    try {
+      const { name } = req.body
+      if (!name) {
+        return res.json({ status: 'error', message: '請填入資訊' })
+      }
+      const newCategory = await Category.create({
+        name,
+        UserId: req.user.id
+      })
+      return res.json(newCategory)
     } catch (err) {
       return res.json(err)
     }
