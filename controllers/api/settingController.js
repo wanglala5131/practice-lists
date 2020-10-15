@@ -107,6 +107,26 @@ const settingController = {
     } catch (err) {
       return res.json(err)
     }
+  },
+  putCategory: async (req, res) => {
+    try {
+      const { id } = req.params
+      const { name } = req.body
+      const putCategory = await Category.findByPk(id, {
+        include: [
+          Subcategory
+        ]
+      })
+      if (!name) {
+        return res.json({ status: 'error', message: "請填入資訊" })
+      }
+      await putCategory.update({
+        name
+      })
+      return res.json({ status: 'success' })
+    } catch (err) {
+      return res.json(err)
+    }
   }
 }
 

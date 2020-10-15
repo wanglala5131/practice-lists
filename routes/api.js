@@ -30,6 +30,7 @@ router.put('/practice/setting/subcategories/:id', authenticated, settingControll
 router.delete('/practice/setting/subcategories/:id', authenticated, settingController.deleteSubcategory)
 router.get('/practice/setting/categories', authenticated, settingController.getCategories)
 router.post('/practice/setting/categories', authenticated, settingController.addCategory)
+router.put('/practice/setting/categories/:id', authenticated, settingController.putCategory)
 
 
 module.exports = router
