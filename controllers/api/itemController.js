@@ -41,7 +41,7 @@ const itemController = {
   addItem: async (req, res) => {
     try {
       const UserId = req.user.id
-      const { name, description, CategoryId, subcategories, limit } = req.body
+      const { name, description, CategoryId: categoryId, subcategories, limit } = req.body
       if (!name || !CategoryId || subcategories.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
@@ -98,7 +98,7 @@ const itemController = {
       const putItem = await Item.findByPk(ItemId, {
         include: [{ model: Subcategory, as: 'Subcategories' }]
       })
-      const { name, description, CategoryId, subcategories, limit } = req.body
+      const { name, description, CategoryId: categoryId, subcategories, limit } = req.body
       if (!name || !CategoryId || subcategories.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
