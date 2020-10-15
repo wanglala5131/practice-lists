@@ -51,11 +51,11 @@ const settingController = {
           { model: Item, as: 'Items' }
         ]
       })
-      if (deleteSubcategory.Items.length === 0) {
-        deleteSubcategory.destroy()
-        return res.json({ status: "success" })
-      } else {
+      if (deleteSubcategory.Items.length) {
         return res.json({ status: "error", message: '項目數須為零才可刪除' })
+      } else {
+        await deleteSubcategory.destroy()
+        return res.json({ status: "success" })
       }
     } catch (err) {
       return res.json(err)
@@ -124,6 +124,24 @@ const settingController = {
         name
       })
       return res.json({ status: 'success' })
+    } catch (err) {
+      return res.json(err)
+    }
+  },
+  deleteCategory: async (req, res) => {
+    try {
+      const { id } = req.params
+      const putCategory = await Category.findByPk(id, {
+        include: [
+          Subcategory
+        ]
+      })
+      if (putCategory.Subcategories.length) {
+        return res.json({ status: 'error', message: '項目類別須為零才可刪除' })
+      } else {
+        await putCategory.destroy()
+        return res.json({ status: 'success' })
+      }
     } catch (err) {
       return res.json(err)
     }
