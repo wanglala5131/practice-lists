@@ -12,13 +12,15 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       Cart.belongsTo(models.User)
+      Cart.belongsTo(models.Item)
     }
   };
   Cart.init({
     userId: DataTypes.INTEGER,
     itemId: DataTypes.INTEGER,
     reps: DataTypes.STRING,
-    remark: DataTypes.STRING
+    remark: DataTypes.STRING,
+    sort: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Cart',
