@@ -105,6 +105,12 @@ const listController = {
     try {
       //TODO: 確認前端是否正確傳物件進來，最外層有一個updateItems，和name
       const { updateItems, listName } = req.body
+      if (!listName) {
+        return res.json({ status: 'error', message: '記得輸入菜單名稱唷！' })
+      }
+      if (updateItems.length < 3) {
+        return res.json({ status: 'error', message: '菜單至少要包含3個項目唷' })
+      }
       const list = await List.create({
         UserId: req.user.id,
         name: listName,
@@ -118,6 +124,15 @@ const listController = {
           remark: item.remark
         })
       }
+      //清空暫時菜單
+      const cartItems = await Cart.findAll({
+        where: {
+          UserId: req.user.id
+        }
+      })
+      const deleteCartItemId = []
+      cartItems.map(item => deleteCartItemId.push(item.id))
+      await Cart.destroy({ where: { id: deleteCartItemId } })
       return res.json({ status: 'success' })
     } catch (err) {
       return res.json(err)
@@ -125,10 +140,20 @@ const listController = {
   },
   getLists: async (req, res) => {
     try {
+      //若沒有傳值，則預設顯示未使用過的菜單
+      let isUsed = false
+      console.log(req.body.isUsed)
+      if (req.body.isUsed) {
+        isUsed = req.body.isUsed
+      }
       const lists = await List.findAll({
         where: {
-          UserId: req.user.id
+          UserId: req.user.id,
+          isUsed
         },
+        order: [
+          ['createdAt', 'DESC']
+        ],
         include: [
           {
             model: Item, as: 'Items', include: [
