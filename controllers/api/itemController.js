@@ -35,7 +35,7 @@ const itemController = {
       })
       return res.json({ status: 'success', item })
     } catch (err) {
-      console.log(err)
+      return res.json(err)
     }
   },
   addItem: async (req, res) => {

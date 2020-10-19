@@ -5,6 +5,22 @@ const Category = db.Category
 const ItemType = db.ItemType
 const Cart = db.Cart
 
+//前端傳進putCartItem的陣列範例
+// const updateItems = [
+//   {
+//     ItemId: 2,
+//     reps: 'eee',
+//     remark: 'eeee--',
+//     sort: 2
+//   },
+//   {
+//     ItemId: 4,
+//     reps: 'eeee--',
+//     remark: 'ee',
+//     sort: 3
+//   }
+// ]
+
 const listController = {
   getCart: async (req, res) => {
     try {
@@ -59,7 +75,18 @@ const listController = {
       return res.json(err)
     }
   },
-
+  putCartItem: async (req, res) => {
+    try {
+      //TODO: 確認前端是否正確傳物件進來，最外層有一個updateItems
+      const { updateItems } = req.body
+      for (let item of updateItems) {
+        await Cart.update(item, { 'where': { ItemId: item.ItemId } })
+      }
+      return res.json({ status: 'success', updateItems })
+    } catch (err) {
+      return res.json(err)
+    }
+  }
 }
 
 module.exports = listController
