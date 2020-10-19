@@ -39,8 +39,9 @@ router.delete('/practice/setting/categories/:id', authenticated, settingControll
 
 //cart
 router.get('/practice/cart', authenticated, listController.getCart)
-router.post('/practice/cart/add/:id', authenticated, listController.addToCart)
+router.post('/practice/cart/:id', authenticated, listController.addToCart)
 router.put('/practice/cart/edit', authenticated, listController.putCartItem)
+router.delete('/practice/cart/:id', authenticated, listController.deleteCartItem)
 
 
 module.exports = router

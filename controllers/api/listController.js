@@ -82,7 +82,16 @@ const listController = {
       for (let item of updateItems) {
         await Cart.update(item, { 'where': { ItemId: item.ItemId } })
       }
-      return res.json({ status: 'success', updateItems })
+      return res.json({ status: 'success' })
+    } catch (err) {
+      return res.json(err)
+    }
+  },
+  deleteCartItem: async (req, res) => {
+    try {
+      const { id } = req.params
+      Cart.destroy({ "where": { id } })
+      return res.json({ status: 'success' })
     } catch (err) {
       return res.json(err)
     }
