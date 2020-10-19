@@ -125,14 +125,14 @@ const listController = {
         })
       }
       //清空暫時菜單
-      const cartItems = await Cart.findAll({
+      const cartItemsArr = await Cart.findAll({
         where: {
           UserId: req.user.id
         }
       })
-      const deleteCartItemId = []
-      cartItems.map(item => deleteCartItemId.push(item.id))
-      await Cart.destroy({ where: { id: deleteCartItemId } })
+      for (let cartItems of cartItemsArr) {
+        await cartItems.destroy()
+      }
       return res.json({ status: 'success' })
     } catch (err) {
       return res.json(err)
@@ -183,6 +183,27 @@ const listController = {
       list.update({
         isUsed: !list.isUsed
       })
+      return res.json({ status: 'success' })
+    } catch (err) {
+      return res.json(err)
+    }
+  },
+  deleteList: async (req, res) => {
+    try {
+      const { id } = req.params
+      const deleteList = await List.findOne({
+        where: {
+          id,
+          UserId: req.user.id,
+        },
+      })
+      await deleteList.destroy()
+      const deleteListItemArr = await ListItem.findAll({
+        where: { ListId: id }
+      })
+      for (let deleteListItem of deleteListItemArr) {
+        await deleteListItem.destroy()
+      }
       return res.json({ status: 'success' })
     } catch (err) {
       return res.json(err)
