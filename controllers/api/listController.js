@@ -4,6 +4,8 @@ const Subcategory = db.Subcategory
 const Category = db.Category
 const ItemType = db.ItemType
 const Cart = db.Cart
+const List = db.List
+const ListItem = db.ListItem
 
 //前端傳進putCartItem的陣列範例
 // const updateItems = [
@@ -26,10 +28,13 @@ const listController = {
     try {
       const cartItem = await Cart.findAll({
         where: {
-          userId: req.user.id
+          UserId: req.user.id
         },
         order: [
           ['sort', 'ASC']
+        ],
+        include: [
+          Item
         ]
       })
       return res.json(cartItem)
@@ -95,7 +100,29 @@ const listController = {
     } catch (err) {
       return res.json(err)
     }
-  }
+  },
+  submitCartItem: async (req, res) => {
+    try {
+      //TODO: 確認前端是否正確傳物件進來，最外層有一個updateItems，和name
+      const { updateItems, listName } = req.body
+      const list = await List.create({
+        UserId: req.user.id,
+        name: listName,
+        isUsed: false
+      })
+      for (let item of updateItems) {
+        await ListItem.create({
+          ListId: list.id,
+          ItemId: item.ItemId,
+          reps: item.reps,
+          remark: item.remark
+        })
+      }
+      return res.json({ status: 'success' })
+    } catch (err) {
+      return res.json(err)
+    }
+  },
 }
 
 module.exports = listController

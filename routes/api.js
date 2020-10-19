@@ -43,5 +43,8 @@ router.post('/practice/cart/:id', authenticated, listController.addToCart)
 router.put('/practice/cart/edit', authenticated, listController.putCartItem)
 router.delete('/practice/cart/:id', authenticated, listController.deleteCartItem)
 
+//list
+router.put('/practice/cart/submit', authenticated, listController.submitCartItem)
+
 
 module.exports = router
