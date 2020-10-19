@@ -42,9 +42,10 @@ router.get('/practice/cart', authenticated, listController.getCart)
 router.post('/practice/cart/:id', authenticated, listController.addToCart)
 router.put('/practice/cart/edit', authenticated, listController.putCartItem)
 router.delete('/practice/cart/:id', authenticated, listController.deleteCartItem)
+router.put('/practice/cart/submit', authenticated, listController.submitCartItem)
 
 //list
-router.put('/practice/cart/submit', authenticated, listController.submitCartItem)
+router.get('/practice/lists', authenticated, listController.getLists)
 
 
 module.exports = router

@@ -123,6 +123,26 @@ const listController = {
       return res.json(err)
     }
   },
+  getLists: async (req, res) => {
+    try {
+      const lists = await List.findAll({
+        where: {
+          UserId: req.user.id
+        },
+        include: [
+          {
+            model: Item, as: 'Items', include: [
+              Category,
+              { model: Subcategory, as: 'Subcategories' }
+            ]
+          },
+        ]
+      })
+      return res.json(lists)
+    } catch (err) {
+      return res.json(err)
+    }
+  }
 }
 
 module.exports = listController
