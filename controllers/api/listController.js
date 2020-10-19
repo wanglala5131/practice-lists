@@ -142,6 +142,26 @@ const listController = {
     } catch (err) {
       return res.json(err)
     }
+  },
+  listStatus: async (req, res) => {
+    try {
+      const { id } = req.params
+      const list = await List.findOne({
+        where: {
+          id,
+          UserId: req.user.id,
+        }
+      })
+      if (!list) {
+        return res.json({ status: 'error', message: '找不到此菜單資料' })
+      }
+      list.update({
+        isUsed: !list.isUsed
+      })
+      return res.json({ status: 'success' })
+    } catch (err) {
+      return res.json(err)
+    }
   }
 }
 

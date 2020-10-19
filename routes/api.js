@@ -46,6 +46,7 @@ router.put('/practice/cart/submit', authenticated, listController.submitCartItem
 
 //list
 router.get('/practice/lists', authenticated, listController.getLists)
+router.put('/practice/lists/:id', authenticated, listController.listStatus)
 
 
 module.exports = router
