@@ -46,11 +46,18 @@ const settingController = {
   deleteSubcategory: async (req, res) => {
     try {
       const { id } = req.params
-      const deleteSubcategory = await Subcategory.findByPk(id, {
+      const deleteSubcategory = await Subcategory.findOne({
+        where: {
+          id,
+          UserId: req.user.id
+        },
         include: [
           { model: Item, as: 'Items' }
         ]
       })
+      if (!deleteSubcategory) {
+        return res.json({ status: 'error', message: '找不到此項目類別' })
+      }
       if (deleteSubcategory.Items.length) {
         return res.json({ status: "error", message: '項目數須為零才可刪除' })
       } else {
@@ -65,7 +72,15 @@ const settingController = {
     try {
       const { id } = req.params
       const { name, CategoryId } = req.body
-      const putSubcategory = await Subcategory.findByPk(id)
+      const putSubcategory = await Subcategory.findOne({
+        where: {
+          id,
+          UserId: req.user.id
+        }
+      })
+      if (!putSubcategory) {
+        return res.json({ status: 'error', message: '找不到此項目類別' })
+      }
       if (!name || !CategoryId) {
         return res.json({ status: 'error', message: '請填入資訊' })
       }
@@ -112,18 +127,25 @@ const settingController = {
     try {
       const { id } = req.params
       const { name } = req.body
-      const putCategory = await Category.findByPk(id, {
+      const putCategory = await Category.findOne({
+        where: {
+          id,
+          UserId: req.user.id
+        },
         include: [
           Subcategory
         ]
       })
+      if (!putCategory) {
+        return res.json({ status: 'error', message: '找不到此運動類型' })
+      }
       if (!name) {
         return res.json({ status: 'error', message: "請填入資訊" })
       }
       await putCategory.update({
         name
       })
-      return res.json({ status: 'success' })
+      return res.json({ status: 'success', putCategory })
     } catch (err) {
       return res.json(err)
     }
@@ -131,15 +153,22 @@ const settingController = {
   deleteCategory: async (req, res) => {
     try {
       const { id } = req.params
-      const putCategory = await Category.findByPk(id, {
+      const deleteCategory = await Category.findOne({
+        where: {
+          id,
+          UserId: req.user.id
+        },
         include: [
           Subcategory
         ]
       })
-      if (putCategory.Subcategories.length) {
+      if (!deleteCategory) {
+        return res.json({ status: 'error', message: '找不到此運動類型' })
+      }
+      if (deleteCategory.Subcategories.length) {
         return res.json({ status: 'error', message: '項目類別須為零才可刪除' })
       } else {
-        await putCategory.destroy()
+        await deleteCategory.destroy()
         return res.json({ status: 'success' })
       }
     } catch (err) {

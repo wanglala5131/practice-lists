@@ -26,7 +26,6 @@ router.put('/practice/items/:id', authenticated, upload.single('image'), itemCon
 router.put('/practice/items/:id/close', authenticated, itemController.closeItem)
 router.delete('/practice/items/:id', authenticated, itemController.deleteItem)
 
-//TODO: 記得加上確認userid的判斷，findByPk要改成findOne
 //setting
 router.get('/practice/setting/subcategories', authenticated, settingController.getSubcategories)
 router.post('/practice/setting/subcategories', authenticated, settingController.addSubcategory)

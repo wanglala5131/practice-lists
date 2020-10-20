@@ -142,7 +142,6 @@ const listController = {
     try {
       //若沒有傳值，則預設顯示未使用過的菜單
       let isUsed = false
-      console.log(req.body.isUsed)
       if (req.body.isUsed) {
         isUsed = req.body.isUsed
       }

@@ -27,12 +27,19 @@ const itemController = {
   getItem: async (req, res) => {
     try {
       const ItemId = req.params.id
-      const item = await Item.findByPk(ItemId, {
+      const item = await Item.findOne({
+        where: {
+          id: ItemId,
+          UserId: req.user.id
+        },
         include: [
           Category,
           { model: Subcategory, as: 'Subcategories' }
         ]
       })
+      if (!item) {
+        return res.json({ status: 'error', message: '找不到此項目資訊' })
+      }
       return res.json({ status: 'success', item })
     } catch (err) {
       return res.json(err)
@@ -94,11 +101,15 @@ const itemController = {
   },
   putItem: async (req, res) => {
     try {
-      const ItemId = req.params.id
-      const putItem = await Item.findByPk(ItemId, {
+      const ItemId = Number(req.params.id)
+      const putItem = await Item.findOne({
+        where: {
+          id: ItemId,
+          UserId: req.user.id
+        },
         include: [{ model: Subcategory, as: 'Subcategories' }]
       })
-      const { name, description, CategoryId: categoryId, subcategories, limit } = req.body
+      const { name, description, CategoryId, subcategories, limit } = req.body
       if (!name || !CategoryId || subcategories.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
@@ -173,7 +184,12 @@ const itemController = {
   closeItem: async (req, res) => {
     try {
       const ItemId = req.params.id
-      const putItem = await Item.findByPk(ItemId)
+      const putItem = await Item.findOne({
+        where: {
+          id: ItemId,
+          UserId: req.user.id
+        }
+      })
       await putItem.update({
         isClosed: !putItem.isClosed
       })
@@ -186,7 +202,12 @@ const itemController = {
   deleteItem: async (req, res) => {
     try {
       const ItemId = req.params.id
-      const deleteItem = await Item.findByPk(ItemId)
+      const deleteItem = await Item.findOne({
+        where: {
+          id: ItemId,
+          UserId: req.user.id
+        }
+      })
       await deleteItem.destroy()
       const deleteItemTypeArr = await ItemType.findAll({
         where: { ItemId }
