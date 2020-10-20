@@ -16,6 +16,7 @@ const authenticated = passport.authenticate('jwt', { session: false })
 router.post('/practice/signin', userController.signIn)
 router.post('/practice/signup', userController.signUp)
 router.get('/practice/users/current', authenticated, userController.currentUser)
+router.put('/practice/users/info', authenticated, userController.changeUserInfo)
 
 //item
 router.get('/', (req, res) => res.redirect('/api/practice'))

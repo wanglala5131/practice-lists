@@ -54,7 +54,43 @@ const userController = {
     const { id, name, email } = req.user
     return res.json({ id, name, email })
   },
-
+  changeUserInfo: async (req, res) => {
+    try {
+      const userId = req.user.id
+      const user = await User.findByPk(userId)
+      const { newName, oldPassword, newPassword, confirmPassword } = req.body
+      if (oldPassword && newPassword && confirmPassword) {
+        if (newPassword === oldPassword) {
+          return res.json({ status: 'error', message: '舊密碼和新密碼必須不一樣唷！' })
+        }
+        if (newPassword !== confirmPassword) {
+          return res.json({ status: 'error', message: '新密碼與確認密碼不同' })
+        }
+        if (bcrypt.compareSync(oldPassword, user.password)) {
+          user.update({
+            password: bcrypt.hashSync(newPassword, bcrypt.genSaltSync(10))
+          })
+          if (newName !== user.name) {
+            user.update({
+              name: newName
+            })
+          }
+          return res.json({ status: 'success' })
+        } else {
+          return res.json({ status: 'error', message: '舊密碼輸入錯誤' })
+        }
+      }
+      if (newName !== user.name) {
+        user.update({
+          name: newName
+        })
+        return res.json({ status: 'success' })
+      }
+      return res.json({ status: 'error', message: '更改密碼的話要輸入舊密碼、新密碼與確認密碼' })
+    } catch (err) {
+      return res.json(err)
+    }
+  }
 }
 
 module.exports = userController
