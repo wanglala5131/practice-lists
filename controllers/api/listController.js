@@ -28,14 +28,16 @@ const listController = {
     try {
       const cartItem = await Cart.findAll({
         where: {
-          UserId: req.user.id
+          UserId: req.user.id,
         },
-        order: [
-          ['sort', 'ASC']
-        ],
+        order: [['sort', 'ASC']],
         include: [
-          Item
-        ]
+          Item,
+          {
+            model: Item,
+            include: [Category, { model: Subcategory, as: 'Subcategories' }],
+          },
+        ],
       })
       return res.json(cartItem)
     } catch (err) {
@@ -49,22 +51,26 @@ const listController = {
       const item = await Item.findOne({
         where: {
           id: ItemId,
-          userId: req.user.id
-        }
+          userId: req.user.id,
+        },
       })
       if (!item) return res.json({ status: 'error', message: '找不到此項目' })
 
       const cartItem = await Cart.findAll({
         where: {
-          userId: req.user.id
-        }
+          userId: req.user.id,
+        },
       })
       if (cartItem.length > 20) {
         return res.json({ status: 'error', message: '暫時菜單最多只能20個唷' })
       } else {
         const repeatItem = await cartItem.filter(item => item.ItemId === ItemId)
         if (repeatItem.length !== 0) {
-          return res.json({ status: 'error', message: '此項目已存在', repeatItem })
+          return res.json({
+            status: 'error',
+            message: '此項目已存在',
+            repeatItem,
+          })
         } else {
           await Cart.create({
             UserId: req.user.id,
@@ -85,7 +91,7 @@ const listController = {
       //TODO: 確認前端是否正確傳物件進來，最外層有一個updateItems
       const { updateItems } = req.body
       for (let item of updateItems) {
-        await Cart.update(item, { 'where': { ItemId: item.ItemId } })
+        await Cart.update(item, { where: { ItemId: item.ItemId } })
       }
       return res.json({ status: 'success' })
     } catch (err) {
@@ -95,7 +101,7 @@ const listController = {
   deleteCartItem: async (req, res) => {
     try {
       const { id } = req.params
-      Cart.destroy({ "where": { id } })
+      Cart.destroy({ where: { id } })
       return res.json({ status: 'success' })
     } catch (err) {
       return res.json(err)
@@ -114,21 +120,21 @@ const listController = {
       const list = await List.create({
         UserId: req.user.id,
         name: listName,
-        isUsed: false
+        isUsed: false,
       })
       for (let item of updateItems) {
         await ListItem.create({
           ListId: list.id,
           ItemId: item.ItemId,
           reps: item.reps,
-          remark: item.remark
+          remark: item.remark,
         })
       }
       //清空暫時菜單
       const cartItemsArr = await Cart.findAll({
         where: {
-          UserId: req.user.id
-        }
+          UserId: req.user.id,
+        },
       })
       for (let cartItems of cartItemsArr) {
         await cartItems.destroy()
@@ -148,19 +154,16 @@ const listController = {
       const lists = await List.findAll({
         where: {
           UserId: req.user.id,
-          isUsed
+          isUsed,
         },
-        order: [
-          ['createdAt', 'DESC']
-        ],
+        order: [['createdAt', 'DESC']],
         include: [
           {
-            model: Item, as: 'Items', include: [
-              Category,
-              { model: Subcategory, as: 'Subcategories' }
-            ]
+            model: Item,
+            as: 'Items',
+            include: [Category, { model: Subcategory, as: 'Subcategories' }],
           },
-        ]
+        ],
       })
       return res.json(lists)
     } catch (err) {
@@ -174,13 +177,13 @@ const listController = {
         where: {
           id,
           UserId: req.user.id,
-        }
+        },
       })
       if (!list) {
         return res.json({ status: 'error', message: '找不到此菜單資料' })
       }
       list.update({
-        isUsed: !list.isUsed
+        isUsed: !list.isUsed,
       })
       return res.json({ status: 'success' })
     } catch (err) {
@@ -198,7 +201,7 @@ const listController = {
       })
       await deleteList.destroy()
       const deleteListItemArr = await ListItem.findAll({
-        where: { ListId: id }
+        where: { ListId: id },
       })
       for (let deleteListItem of deleteListItemArr) {
         await deleteListItem.destroy()
@@ -207,7 +210,7 @@ const listController = {
     } catch (err) {
       return res.json(err)
     }
-  }
+  },
 }
 
 module.exports = listController

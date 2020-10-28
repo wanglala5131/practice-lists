@@ -4,28 +4,24 @@ const Subcategory = db.Subcategory
 const Category = db.Category
 const ItemType = db.ItemType
 
-
 const settingController = {
   getSubcategories: async (req, res) => {
     try {
       const subcategories = await Subcategory.findAll({
         where: {
-          UserId: req.user.id
+          UserId: req.user.id,
         },
-        include: [
-          { model: Item, as: 'Items' }
-        ]
+        include: [{ model: Item, as: 'Items' }],
       })
       const categories = await Category.findAll({
         where: {
-          UserId: req.user.id
-        }
+          UserId: req.user.id,
+        },
       })
       return res.json({ subcategories, categories })
     } catch (err) {
       return res.json(err)
     }
-
   },
   addSubcategory: async (req, res) => {
     try {
@@ -36,7 +32,7 @@ const settingController = {
       const newSubcategory = await Subcategory.create({
         name,
         CategoryId,
-        UserId: req.user.id
+        UserId: req.user.id,
       })
       return res.json(newSubcategory)
     } catch (err) {
@@ -49,20 +45,18 @@ const settingController = {
       const deleteSubcategory = await Subcategory.findOne({
         where: {
           id,
-          UserId: req.user.id
+          UserId: req.user.id,
         },
-        include: [
-          { model: Item, as: 'Items' }
-        ]
+        include: [{ model: Item, as: 'Items' }],
       })
       if (!deleteSubcategory) {
         return res.json({ status: 'error', message: '找不到此項目類別' })
       }
       if (deleteSubcategory.Items.length) {
-        return res.json({ status: "error", message: '項目數須為零才可刪除' })
+        return res.json({ status: 'error', message: '項目數須為零才可刪除' })
       } else {
         await deleteSubcategory.destroy()
-        return res.json({ status: "success" })
+        return res.json({ status: 'success' })
       }
     } catch (err) {
       return res.json(err)
@@ -75,8 +69,8 @@ const settingController = {
       const putSubcategory = await Subcategory.findOne({
         where: {
           id,
-          UserId: req.user.id
-        }
+          UserId: req.user.id,
+        },
       })
       if (!putSubcategory) {
         return res.json({ status: 'error', message: '找不到此項目類別' })
@@ -86,9 +80,9 @@ const settingController = {
       }
       await putSubcategory.update({
         name,
-        CategoryId
+        CategoryId,
       })
-      return res.json({ status: "success" })
+      return res.json({ status: 'success' })
     } catch (err) {
       return res.json(err)
     }
@@ -97,11 +91,9 @@ const settingController = {
     try {
       const categories = await Category.findAll({
         where: {
-          UserId: req.user.id
+          UserId: req.user.id,
         },
-        include: [
-          Subcategory
-        ]
+        include: [Subcategory],
       })
       return res.json(categories)
     } catch (err) {
@@ -116,7 +108,7 @@ const settingController = {
       }
       const newCategory = await Category.create({
         name,
-        UserId: req.user.id
+        UserId: req.user.id,
       })
       return res.json(newCategory)
     } catch (err) {
@@ -130,20 +122,18 @@ const settingController = {
       const putCategory = await Category.findOne({
         where: {
           id,
-          UserId: req.user.id
+          UserId: req.user.id,
         },
-        include: [
-          Subcategory
-        ]
+        include: [Subcategory],
       })
       if (!putCategory) {
         return res.json({ status: 'error', message: '找不到此運動類型' })
       }
       if (!name) {
-        return res.json({ status: 'error', message: "請填入資訊" })
+        return res.json({ status: 'error', message: '請填入資訊' })
       }
       await putCategory.update({
-        name
+        name,
       })
       return res.json({ status: 'success', putCategory })
     } catch (err) {
@@ -156,11 +146,9 @@ const settingController = {
       const deleteCategory = await Category.findOne({
         where: {
           id,
-          UserId: req.user.id
+          UserId: req.user.id,
         },
-        include: [
-          Subcategory
-        ]
+        include: [Subcategory],
       })
       if (!deleteCategory) {
         return res.json({ status: 'error', message: '找不到此運動類型' })
@@ -174,7 +162,7 @@ const settingController = {
     } catch (err) {
       return res.json(err)
     }
-  }
+  },
 }
 
 module.exports = settingController
