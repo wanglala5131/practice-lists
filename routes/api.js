@@ -26,6 +26,7 @@ router.post('/practice/items', authenticated, upload.single('image'), itemContro
 router.put('/practice/items/:id', authenticated, upload.single('image'), itemController.putItem)
 router.put('/practice/items/:id/close', authenticated, itemController.closeItem)
 router.delete('/practice/items/:id', authenticated, itemController.deleteItem)
+router.put('/practice/items/like/:id', authenticated,itemController.changeLike)
 
 //setting
 router.get('/practice/setting/subcategories', authenticated, settingController.getSubcategories)
@@ -36,6 +37,7 @@ router.get('/practice/setting/categories', authenticated, settingController.getC
 router.post('/practice/setting/categories', authenticated, settingController.addCategory)
 router.put('/practice/setting/categories/:id', authenticated, settingController.putCategory)
 router.delete('/practice/setting/categories/:id', authenticated, settingController.deleteCategory)
+
 
 //cart
 router.get('/practice/cart', authenticated, listController.getCart)

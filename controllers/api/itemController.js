@@ -125,6 +125,9 @@ const itemController = {
         },
         include: [{ model: Subcategory, as: 'Subcategories' }],
       })
+      if (!putItem) {
+        return res.json({ status: 'error', message: '找不到此項目資訊' })
+      }
       const { name, description, CategoryId, subcategories, limit } = req.body
       if (!name || !CategoryId || subcategories.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
@@ -208,12 +211,15 @@ const itemController = {
           UserId: req.user.id,
         },
       })
+      if (!putItem) {
+        return res.json({ status: 'error', message: '找不到此項目資訊' })
+      }
       await putItem.update({
         isClosed: !putItem.isClosed,
       })
       res.json({ status: 'success' })
     } catch (err) {
-      res.json(err)
+      return res.json(err)
     }
   },
   deleteItem: async (req, res) => {
@@ -225,6 +231,9 @@ const itemController = {
           UserId: req.user.id,
         },
       })
+      if (!deleteItem) {
+        return res.json({ status: 'error', message: '找不到此項目資訊' })
+      }
       await deleteItem.destroy()
       const deleteItemTypeArr = await ItemType.findAll({
         where: { ItemId },
@@ -232,6 +241,26 @@ const itemController = {
       for (let deleteItemType of deleteItemTypeArr) {
         await deleteItemType.destroy()
       }
+      return res.json({ status: 'success' })
+    } catch (err) {
+      return res.json(err)
+    }
+  },
+  changeLike: async (req, res) => {
+    try {
+      const ItemId = req.params.id
+      const item = await Item.findOne({
+        where: {
+          id: ItemId,
+          UserId: req.user.id,
+        },
+      })
+      if (!item) {
+        return res.json({ status: 'error', message: '找不到此項目資訊' })
+      }
+      await item.update({
+        isLiked: !item.isLiked,
+      })
       return res.json({ status: 'success' })
     } catch (err) {
       res.json(err)
