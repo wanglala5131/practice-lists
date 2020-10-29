@@ -3,6 +3,7 @@ const Item = db.Item
 const Subcategory = db.Subcategory
 const Category = db.Category
 const ItemType = db.ItemType
+const Cart = db.Cart
 const fs = require('fs')
 
 const itemController = {
@@ -11,16 +12,26 @@ const itemController = {
       const userId = req.user.id
       const items = await Item.findAll({
         where: {
-          userId
+          userId,
+        },
+        include: [Category, { model: Subcategory, as: 'Subcategories' }],
+      })
+      const cartItems = await Cart.findAll({
+        where: {
+          userId,
         },
         include: [
-          Category,
-          { model: Subcategory, as: 'Subcategories' }
-        ]
+          Item,
+          {
+            model: Item,
+            include: [Category, { model: Subcategory, as: 'Subcategories' }],
+          },
+        ],
       })
-      return res.json({ items })
-    }
-    catch (err) {
+      let cartItemsArr = []
+      cartItems.map(cartItem => cartItemsArr.push(cartItem.ItemId))
+      return res.json({ items, cartItems, cartItemsArr })
+    } catch (err) {
       return res.json(err)
     }
   },
@@ -30,12 +41,9 @@ const itemController = {
       const item = await Item.findOne({
         where: {
           id: ItemId,
-          UserId: req.user.id
+          UserId: req.user.id,
         },
-        include: [
-          Category,
-          { model: Subcategory, as: 'Subcategories' }
-        ]
+        include: [Category, { model: Subcategory, as: 'Subcategories' }],
       })
       if (!item) {
         return res.json({ status: 'error', message: '找不到此項目資訊' })
@@ -48,14 +56,22 @@ const itemController = {
   addItem: async (req, res) => {
     try {
       const UserId = req.user.id
-      const { name, description, CategoryId: categoryId, subcategories, limit } = req.body
+      const {
+        name,
+        description,
+        CategoryId: categoryId,
+        subcategories,
+        limit,
+      } = req.body
       if (!name || !CategoryId || subcategories.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
       const { file } = req
       if (file) {
         fs.readFile(file.path, (err, data) => {
-          if (err) { return res.json({ message: 'error' }) }
+          if (err) {
+            return res.json({ message: 'error' })
+          }
           fs.writeFile(`upload/${file.originalname}`, data, async () => {
             const newItem = await Item.create({
               name,
@@ -64,13 +80,13 @@ const itemController = {
               CategoryId,
               limit,
               UserId,
-              isClosed: false
+              isClosed: false,
             })
             const ItemId = await newItem.id
             for (let subcategory of subcategories) {
               await ItemType.create({
                 ItemId,
-                SubcategoryId: Number(subcategory)
+                SubcategoryId: Number(subcategory),
               })
             }
             return res.json({ newItem })
@@ -84,13 +100,13 @@ const itemController = {
           CategoryId,
           limit,
           UserId,
-          isClosed: false
+          isClosed: false,
         })
         const ItemId = await newItem.id
         for (let subcategory of subcategories) {
           await ItemType.create({
             ItemId,
-            SubcategoryId: Number(subcategory)
+            SubcategoryId: Number(subcategory),
           })
         }
         return res.json({ newItem })
@@ -105,9 +121,9 @@ const itemController = {
       const putItem = await Item.findOne({
         where: {
           id: ItemId,
-          UserId: req.user.id
+          UserId: req.user.id,
         },
-        include: [{ model: Subcategory, as: 'Subcategories' }]
+        include: [{ model: Subcategory, as: 'Subcategories' }],
       })
       const { name, description, CategoryId, subcategories, limit } = req.body
       if (!name || !CategoryId || subcategories.length === 0) {
@@ -117,7 +133,9 @@ const itemController = {
       if (file) {
         fs.readFile(file.path, async (err, data) => {
           try {
-            if (err) { return res.json({ message: 'error' }) }
+            if (err) {
+              return res.json({ message: 'error' })
+            }
             await fs.writeFile(`upload/${file.originalname}`, data, () => {
               putItem.update({
                 name,
@@ -139,18 +157,18 @@ const itemController = {
           limit,
         })
       }
-      //處理Subcategory  
+      //處理Subcategory
       const newSubArr = subcategories.map(Number)
       const oriSubArr = []
       for (let subcategory of putItem.Subcategories) {
         await oriSubArr.push(subcategory.id)
       }
-      const addSubArr = newSubArr.filter((subcategoryId) => {
+      const addSubArr = newSubArr.filter(subcategoryId => {
         if (!oriSubArr.includes(subcategoryId)) {
           return subcategoryId
         }
       })
-      const deleteSubArr = oriSubArr.filter((subcategoryId) => {
+      const deleteSubArr = oriSubArr.filter(subcategoryId => {
         if (!newSubArr.includes(subcategoryId)) {
           return subcategoryId
         }
@@ -160,7 +178,7 @@ const itemController = {
         for (let subcategoryId of addSubArr) {
           ItemType.create({
             ItemId,
-            SubcategoryId: subcategoryId
+            SubcategoryId: subcategoryId,
           })
         }
       }
@@ -170,8 +188,8 @@ const itemController = {
           const deleteItemType = await ItemType.findAll({
             where: {
               ItemId,
-              SubcategoryId: subcategoryId
-            }
+              SubcategoryId: subcategoryId,
+            },
           })
           await deleteItemType[0].destroy()
         }
@@ -187,15 +205,14 @@ const itemController = {
       const putItem = await Item.findOne({
         where: {
           id: ItemId,
-          UserId: req.user.id
-        }
+          UserId: req.user.id,
+        },
       })
       await putItem.update({
-        isClosed: !putItem.isClosed
+        isClosed: !putItem.isClosed,
       })
       res.json({ status: 'success' })
-    }
-    catch (err) {
+    } catch (err) {
       res.json(err)
     }
   },
@@ -205,22 +222,21 @@ const itemController = {
       const deleteItem = await Item.findOne({
         where: {
           id: ItemId,
-          UserId: req.user.id
-        }
+          UserId: req.user.id,
+        },
       })
       await deleteItem.destroy()
       const deleteItemTypeArr = await ItemType.findAll({
-        where: { ItemId }
+        where: { ItemId },
       })
       for (let deleteItemType of deleteItemTypeArr) {
         await deleteItemType.destroy()
       }
       return res.json({ status: 'success' })
-    }
-    catch (err) {
+    } catch (err) {
       res.json(err)
     }
-  }
+  },
 }
 
 module.exports = itemController
