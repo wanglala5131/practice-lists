@@ -21,6 +21,7 @@ router.put('/practice/users/info', authenticated, userController.changeUserInfo)
 //item
 router.get('/', (req, res) => res.redirect('/api/practice'))
 router.get('/practice', authenticated, itemController.getItems)
+router.get('/practice/items/close', authenticated, itemController.getCloseItems)
 router.get('/practice/items/:id', authenticated, itemController.getItem)
 router.post('/practice/items', authenticated, upload.single('image'), itemController.addItem)
 router.put('/practice/items/:id', authenticated, upload.single('image'), itemController.putItem)

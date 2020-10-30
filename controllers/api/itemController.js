@@ -13,6 +13,36 @@ const itemController = {
       const items = await Item.findAll({
         where: {
           userId,
+          isClosed: false,
+        },
+        include: [Category, { model: Subcategory, as: 'Subcategories' }],
+      })
+      const cartItems = await Cart.findAll({
+        where: {
+          userId,
+        },
+        include: [
+          Item,
+          {
+            model: Item,
+            include: [Category, { model: Subcategory, as: 'Subcategories' }],
+          },
+        ],
+      })
+      let cartItemsArr = []
+      cartItems.map(cartItem => cartItemsArr.push(cartItem.ItemId))
+      return res.json({ items, cartItems, cartItemsArr })
+    } catch (err) {
+      return res.json(err)
+    }
+  },
+  getCloseItems: async (req, res) => {
+    try {
+      const userId = req.user.id
+      const items = await Item.findAll({
+        where: {
+          userId,
+          isClosed: true,
         },
         include: [Category, { model: Subcategory, as: 'Subcategories' }],
       })
