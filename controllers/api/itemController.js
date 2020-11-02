@@ -230,8 +230,20 @@ const itemController = {
       if (!putItem) {
         return res.json({ status: 'error', message: '找不到此項目資訊' })
       }
+      const cartItems = await Cart.findOne({
+        where: {
+          ItemId,
+        },
+      })
+      if (cartItems) {
+        return res.json({
+          status: 'error',
+          message: '請從暫定清單中移除此項目，再進行封存',
+        })
+      }
       await putItem.update({
         isClosed: !putItem.isClosed,
+        isLiked: false,
       })
       res.json({ status: 'success' })
     } catch (err) {
