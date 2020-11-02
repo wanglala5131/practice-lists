@@ -46,21 +46,7 @@ const itemController = {
         },
         include: [Category, { model: Subcategory, as: 'Subcategories' }],
       })
-      const cartItems = await Cart.findAll({
-        where: {
-          userId,
-        },
-        include: [
-          Item,
-          {
-            model: Item,
-            include: [Category, { model: Subcategory, as: 'Subcategories' }],
-          },
-        ],
-      })
-      let cartItemsArr = []
-      cartItems.map(cartItem => cartItemsArr.push(cartItem.ItemId))
-      return res.json({ items, cartItems, cartItemsArr })
+      return res.json({ items })
     } catch (err) {
       return res.json(err)
     }
