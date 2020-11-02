@@ -55,7 +55,12 @@ const listController = {
         },
       })
       if (!item) return res.json({ status: 'error', message: '找不到此項目' })
-
+      if (item.isClosed) {
+        return res.json({
+          status: 'error',
+          message: '此項目已被封存，無法加入暫定清單',
+        })
+      }
       const cartItem = await Cart.findAll({
         where: {
           userId: req.user.id,
@@ -72,14 +77,14 @@ const listController = {
             repeatItem,
           })
         } else {
-          await Cart.create({
+          const data = await Cart.create({
             UserId: req.user.id,
             ItemId: item.id,
             reps: '',
             remark: '',
             sort: 1000,
           })
-          return res.json({ status: 'success' })
+          return res.json({ status: 'success', data })
         }
       }
     } catch (err) {
