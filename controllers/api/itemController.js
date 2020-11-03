@@ -53,6 +53,7 @@ const itemController = {
   },
   getItem: async (req, res) => {
     try {
+      const userId = req.user.id
       const ItemId = req.params.id
       const item = await Item.findOne({
         where: {
@@ -64,7 +65,21 @@ const itemController = {
       if (!item) {
         return res.json({ status: 'error', message: '找不到此項目資訊' })
       }
-      return res.json({ status: 'success', item })
+      const cartItems = await Cart.findAll({
+        where: {
+          userId,
+        },
+        include: [
+          Item,
+          {
+            model: Item,
+            include: [Category, { model: Subcategory, as: 'Subcategories' }],
+          },
+        ],
+      })
+      let cartItemsArr = []
+      cartItems.map(cartItem => cartItemsArr.push(cartItem.ItemId))
+      return res.json({ status: 'success', item, cartItems, cartItemsArr })
     } catch (err) {
       return res.json(err)
     }
