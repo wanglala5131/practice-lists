@@ -90,11 +90,11 @@ const itemController = {
       const {
         name,
         description,
-        CategoryId: categoryId,
-        subcategories,
+        CategoryId,
+        subcategoriesArr,
         limit,
       } = req.body
-      if (!name || !CategoryId || subcategories.length === 0) {
+      if (!name || !CategoryId || subcategoriesArr.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
       const { file } = req
@@ -112,9 +112,10 @@ const itemController = {
               limit,
               UserId,
               isClosed: false,
+              isLiked: false,
             })
             const ItemId = await newItem.id
-            for (let subcategory of subcategories) {
+            for (let subcategory of subcategoriesArr) {
               await ItemType.create({
                 ItemId,
                 SubcategoryId: Number(subcategory),
@@ -132,9 +133,10 @@ const itemController = {
           limit,
           UserId,
           isClosed: false,
+          isLiked: false,
         })
         const ItemId = await newItem.id
-        for (let subcategory of subcategories) {
+        for (let subcategory of subcategoriesArr) {
           await ItemType.create({
             ItemId,
             SubcategoryId: Number(subcategory),
