@@ -161,8 +161,14 @@ const itemController = {
       if (!putItem) {
         return res.json({ status: 'error', message: '找不到此項目資訊' })
       }
-      const { name, description, CategoryId, subcategories, limit } = req.body
-      if (!name || !CategoryId || subcategories.length === 0) {
+      const {
+        name,
+        description,
+        CategoryId,
+        subcategoriesArr,
+        limit,
+      } = req.body
+      if (!name || !CategoryId || subcategoriesArr.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
       const { file } = req
@@ -172,21 +178,26 @@ const itemController = {
             if (err) {
               return res.json({ message: 'error' })
             }
-            await fs.writeFile(`upload/${file.originalname}`, data, () => {
-              putItem.update({
-                name,
-                description,
-                image: `/upload/${file.originalname}`,
-                CategoryId,
-                limit,
-              })
-            })
+            let updateItem
+            await fs.writeFile(
+              `upload/${file.originalname}`,
+              data,
+              async () => {
+                updateItem = await putItem.update({
+                  name,
+                  description,
+                  image: `/upload/${file.originalname}`,
+                  CategoryId,
+                  limit,
+                })
+              }
+            )
           } catch (err) {
             return res.json(err)
           }
         })
       } else {
-        await putItem.update({
+        updateItem = await putItem.update({
           name,
           description,
           CategoryId,
@@ -194,7 +205,7 @@ const itemController = {
         })
       }
       //處理Subcategory
-      const newSubArr = subcategories.map(Number)
+      const newSubArr = subcategoriesArr.map(Number)
       const oriSubArr = []
       for (let subcategory of putItem.Subcategories) {
         await oriSubArr.push(subcategory.id)
@@ -230,7 +241,7 @@ const itemController = {
           await deleteItemType[0].destroy()
         }
       }
-      res.json({ status: 'success' })
+      res.json({ status: 'success', updateItem })
     } catch (err) {
       res.json(err)
     }
