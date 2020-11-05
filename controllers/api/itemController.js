@@ -171,39 +171,6 @@ const itemController = {
       if (!name || !CategoryId || subcategoriesArr.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
-      const { file } = req
-      if (file) {
-        fs.readFile(file.path, async (err, data) => {
-          try {
-            if (err) {
-              return res.json({ message: 'error' })
-            }
-            let updateItem
-            await fs.writeFile(
-              `upload/${file.originalname}`,
-              data,
-              async () => {
-                updateItem = await putItem.update({
-                  name,
-                  description,
-                  image: `/upload/${file.originalname}`,
-                  CategoryId,
-                  limit,
-                })
-              }
-            )
-          } catch (err) {
-            return res.json(err)
-          }
-        })
-      } else {
-        updateItem = await putItem.update({
-          name,
-          description,
-          CategoryId,
-          limit,
-        })
-      }
       //處理Subcategory
       const newSubArr = subcategoriesArr.map(Number)
       const oriSubArr = []
@@ -241,7 +208,36 @@ const itemController = {
           await deleteItemType[0].destroy()
         }
       }
-      res.json({ status: 'success', updateItem })
+      const { file } = req
+      if (file) {
+        fs.readFile(file.path, (err, data) => {
+          if (err) {
+            return res.json({ message: 'error' })
+          }
+          fs.writeFile(`upload/${file.originalname}`, data, async () => {
+            try {
+              const updateItem = await putItem.update({
+                name,
+                description,
+                image: `/upload/${file.originalname}`,
+                CategoryId,
+                limit,
+              })
+              return res.json({ status: 'success', updateItem })
+            } catch (err) {
+              return res.json(err)
+            }
+          })
+        })
+      } else {
+        const updateItem = await putItem.update({
+          name,
+          description,
+          CategoryId,
+          limit,
+        })
+        return res.json({ status: 'success', updateItem })
+      }
     } catch (err) {
       res.json(err)
     }
