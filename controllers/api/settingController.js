@@ -65,7 +65,8 @@ const settingController = {
   putSubcategory: async (req, res) => {
     try {
       const { id } = req.params
-      const { name, CategoryId } = req.body
+      const { name, CategoryId } = req.body.value
+      console.log('name', name)
       const putSubcategory = await Subcategory.findOne({
         where: {
           id,
@@ -73,23 +74,30 @@ const settingController = {
         },
         include: [{ model: Item, as: 'Items' }],
       })
-      if (putSubcategory.Item.length > 0) {
-        return res.json({
-          status: 'error',
-          message: '若有項目屬於此類型，無法修改運動類別',
-        })
-      }
       if (!putSubcategory) {
         return res.json({ status: 'error', message: '找不到此項目類別' })
       }
-      if (!name || !CategoryId) {
-        return res.json({ status: 'error', message: '請填入資訊' })
+      //修改運動類別
+      if (CategoryId) {
+        if (putSubcategory.Items.length > 0) {
+          return res.json({
+            status: 'error',
+            message: '若有項目屬於此類型，無法修改運動類別',
+          })
+        }
+        await putSubcategory.update({
+          CategoryId,
+        })
+        return res.json({ status: 'success' })
       }
-      await putSubcategory.update({
-        name,
-        CategoryId,
-      })
-      return res.json({ status: 'success' })
+      //只修改名稱
+      if (name) {
+        await putSubcategory.update({
+          name,
+        })
+        return res.json({ status: 'success' })
+      }
+      return res.json({ status: 'error', message: '請填入資訊' })
     } catch (err) {
       return res.json(err)
     }
