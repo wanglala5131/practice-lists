@@ -71,7 +71,14 @@ const settingController = {
           id,
           UserId: req.user.id,
         },
+        include: [{ model: Item, as: 'Items' }],
       })
+      if (putSubcategory.Item.length > 0) {
+        return res.json({
+          status: 'error',
+          message: '若有項目屬於此類型，無法修改運動類別',
+        })
+      }
       if (!putSubcategory) {
         return res.json({ status: 'error', message: '找不到此項目類別' })
       }
