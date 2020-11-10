@@ -25,9 +25,9 @@ router.get('/practice/items/close', authenticated, itemController.getCloseItems)
 router.get('/practice/items/:id', authenticated, itemController.getItem)
 router.post('/practice/items', authenticated, upload.single('image'), itemController.addItem)
 router.put('/practice/items/:id', authenticated, upload.single('image'), itemController.putItem)
-router.put('/practice/items/:id/close', authenticated, itemController.closeItem)
+router.patch('/practice/items/:id/close', authenticated, itemController.closeItem)
 router.delete('/practice/items/:id', authenticated, itemController.deleteItem)
-router.put('/practice/items/like/:id', authenticated,itemController.changeLike)
+router.patch('/practice/items/like/:id', authenticated,itemController.changeLike)
 
 //setting
 router.get('/practice/setting/subcategories', authenticated, settingController.getSubcategories)
