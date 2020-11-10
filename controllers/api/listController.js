@@ -149,11 +149,8 @@ const listController = {
   },
   getLists: async (req, res) => {
     try {
-      //若沒有傳值，則預設顯示未使用過的菜單
-      let isUsed = false
-      if (req.body.isUsed) {
-        isUsed = req.body.isUsed
-      }
+      const oriIsUsed = req.query.isUsed
+      let isUsed = oriIsUsed === 'false' ? false : true
       const lists = await List.findAll({
         where: {
           UserId: req.user.id,
