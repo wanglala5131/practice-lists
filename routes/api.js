@@ -45,9 +45,9 @@ router.get('/practice/cart', authenticated, listController.getCart)
 router.post('/practice/cart/:id', authenticated, listController.addToCart)
 router.put('/practice/cart/edit', authenticated, listController.putCartItem)
 router.delete('/practice/cart/:id', authenticated, listController.deleteCartItem)
-router.put('/practice/cart/submit', authenticated, listController.submitCartItem)
 
 //list
+router.post('/practice/lists', authenticated, listController.submitCartItem)
 router.get('/practice/lists', authenticated, listController.getLists)
 router.put('/practice/lists/:id', authenticated, listController.listStatus)
 router.delete('/practice/lists/:id', authenticated, listController.deleteList)

@@ -93,7 +93,6 @@ const listController = {
   },
   putCartItem: async (req, res) => {
     try {
-      //TODO: 確認前端是否正確傳物件進來，最外層有一個updateItems
       const { updateItems } = req.body
       for (let item of updateItems) {
         await Cart.update(item, { where: { ItemId: item.ItemId } })
@@ -114,7 +113,6 @@ const listController = {
   },
   submitCartItem: async (req, res) => {
     try {
-      //TODO: 確認前端是否正確傳物件進來，最外層有一個updateItems，和name
       const { updateItems, listName } = req.body
       if (!listName) {
         return res.json({ status: 'error', message: '記得輸入菜單名稱唷！' })
@@ -144,7 +142,7 @@ const listController = {
       for (let cartItems of cartItemsArr) {
         await cartItems.destroy()
       }
-      return res.json({ status: 'success' })
+      return res.json({ status: 'success', list })
     } catch (err) {
       return res.json(err)
     }
