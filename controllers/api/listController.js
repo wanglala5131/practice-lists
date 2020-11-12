@@ -170,6 +170,30 @@ const listController = {
       return res.json(err)
     }
   },
+  getList: async (req, res) => {
+    try {
+      const { id } = req.params
+      const list = await List.findOne({
+        where: {
+          UserId: req.user.id,
+          id,
+        },
+        include: [
+          {
+            model: Item,
+            as: 'Items',
+            include: [Category, { model: Subcategory, as: 'Subcategories' }],
+          },
+        ],
+      })
+      if (!list) {
+        return res.json({ status: 'error', message: '找不到此清單' })
+      }
+      return res.json(list)
+    } catch (err) {
+      return res.json(err)
+    }
+  },
   listStatus: async (req, res) => {
     try {
       const { id } = req.params

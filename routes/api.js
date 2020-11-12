@@ -49,6 +49,7 @@ router.delete('/practice/cart/:id', authenticated, listController.deleteCartItem
 //list
 router.post('/practice/lists', authenticated, listController.submitCartItem)
 router.get('/practice/lists', authenticated, listController.getLists)
+router.get(`/practice/lists/:id`,authenticated, listController.getList)
 router.patch('/practice/lists/:id', authenticated, listController.listStatus)
 router.delete('/practice/lists/:id', authenticated, listController.deleteList)
 
