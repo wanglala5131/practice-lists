@@ -18,6 +18,7 @@ module.exports = (sequelize, DataTypes) => {
       reps: DataTypes.STRING,
       remark: DataTypes.STRING,
       sort: DataTypes.INTEGER,
+      userId: DataTypes.INTEGER,
     },
     {
       sequelize,

@@ -133,6 +133,7 @@ const listController = {
           reps: item.reps,
           remark: item.remark,
           sort: sortCount,
+          UserId: req.user.id,
         })
         sortCount++
       }
@@ -261,6 +262,7 @@ const listController = {
       })
       const listItems = await ListItem.findAll({
         where: {
+          UserId: req.user.id,
           ListId,
         },
       })
@@ -298,8 +300,18 @@ const listController = {
     try {
       const ListId = req.params.id
       const ItemId = req.params.itemId
+      const listItems = await ListItem.findAll({
+        where: {
+          UserId: req.user.id,
+          ListId,
+        },
+      })
+      if (listItems.length <= 3) {
+        return res.json({ status: 'error', message: '菜單項目至少要三項' })
+      }
       await ListItem.destroy({
         where: {
+          UserId: req.user.id,
           ListId,
           ItemId,
         },
