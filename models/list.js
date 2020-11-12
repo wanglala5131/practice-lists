@@ -1,7 +1,5 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+'use strict'
+const { Model } = require('sequelize')
 module.exports = (sequelize, DataTypes) => {
   class List extends Model {
     /**
@@ -15,17 +13,20 @@ module.exports = (sequelize, DataTypes) => {
       List.belongsToMany(models.Item, {
         through: models.ListItem,
         foreignKey: 'ListId',
-        as: 'Items'
+        as: 'Items',
       })
     }
-  };
-  List.init({
-    userId: DataTypes.INTEGER,
-    name: DataTypes.STRING,
-    isUsed: DataTypes.BOOLEAN
-  }, {
-    sequelize,
-    modelName: 'List',
-  });
-  return List;
-};
+  }
+  List.init(
+    {
+      userId: DataTypes.INTEGER,
+      name: DataTypes.STRING,
+      isUsed: DataTypes.BOOLEAN,
+    },
+    {
+      sequelize,
+      modelName: 'List',
+    }
+  )
+  return List
+}

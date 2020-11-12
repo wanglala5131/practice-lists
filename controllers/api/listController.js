@@ -125,13 +125,16 @@ const listController = {
         name: listName,
         isUsed: false,
       })
+      let sortCount = 0
       for (let item of updateItems) {
         await ListItem.create({
           ListId: list.id,
           ItemId: item.ItemId,
           reps: item.reps,
           remark: item.remark,
+          sort: sortCount,
         })
+        sortCount++
       }
       //清空暫時菜單
       const cartItemsArr = await Cart.findAll({
@@ -156,7 +159,10 @@ const listController = {
           UserId: req.user.id,
           isUsed,
         },
-        order: [['createdAt', 'DESC']],
+        order: [
+          ['createdAt', 'DESC'],
+          [{ model: Item, as: 'Items' }, { model: ListItem }, 'sort', 'ASC'],
+        ],
         include: [
           {
             model: Item,
