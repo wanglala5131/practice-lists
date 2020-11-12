@@ -294,6 +294,21 @@ const listController = {
       return res.json(err)
     }
   },
+  deleteListItem: async (req, res) => {
+    try {
+      const ListId = req.params.id
+      const ItemId = req.params.itemId
+      await ListItem.destroy({
+        where: {
+          ListId,
+          ItemId,
+        },
+      })
+      return res.json({ status: 'success' })
+    } catch (err) {
+      return res.json(err)
+    }
+  },
 }
 
 module.exports = listController
