@@ -244,6 +244,56 @@ const listController = {
       return res.json(err)
     }
   },
+  putList: async (req, res) => {
+    try {
+      const ListId = req.params.id
+      const { updateItems, listName } = req.body
+      if (updateItems.length < 3) {
+        return res.json({ status: 'error', message: '項目至少需要三項' })
+      }
+      if (!listName) {
+        return res.json({ status: 'error', message: '請輸入菜單名稱' })
+      }
+      const list = await List.findOne({
+        where: {
+          id: ListId,
+        },
+      })
+      const listItems = await ListItem.findAll({
+        where: {
+          ListId,
+        },
+      })
+      if (list.name !== listName) {
+        await list.update({
+          name: listName,
+        })
+      }
+      for (let item of listItems) {
+        for (let upItem of updateItems) {
+          if (item.ItemId === upItem.ItemId) {
+            //有不一樣才更新
+            if (
+              item.sort !== upItem.sort ||
+              item.sort !== upItem.sort ||
+              item.remark !== upItem.remark ||
+              item.reps !== upItem.reps
+            ) {
+              item.update({
+                sort: upItem.sort,
+                remark: upItem.remark,
+                reps: upItem.reps,
+              })
+            }
+            break //找到了就跳下一個迴圈
+          }
+        }
+      }
+      return res.json({ status: 'success' })
+    } catch (err) {
+      return res.json(err)
+    }
+  },
 }
 
 module.exports = listController

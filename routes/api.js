@@ -52,6 +52,7 @@ router.get('/practice/lists', authenticated, listController.getLists)
 router.get(`/practice/lists/:id`,authenticated, listController.getList)
 router.patch('/practice/lists/:id', authenticated, listController.listStatus)
 router.delete('/practice/lists/:id', authenticated, listController.deleteList)
+router.put('/practice/lists/:id',authenticated,listController.putList)
 
 
 module.exports = router
