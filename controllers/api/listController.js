@@ -184,6 +184,9 @@ const listController = {
           UserId: req.user.id,
           id,
         },
+        order: [
+          [{ model: Item, as: 'Items' }, { model: ListItem }, 'sort', 'ASC'],
+        ],
         include: [
           {
             model: Item,
