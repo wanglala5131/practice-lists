@@ -321,6 +321,39 @@ const listController = {
       return res.json(err)
     }
   },
+  addItemToList: async (req, res) => {
+    try {
+      const ListId = Number(req.params.id)
+      const ItemId = Number(req.body.ItemId)
+      const listItems = await ListItem.findAll({
+        where: {
+          UserId: req.user.id,
+          ListId,
+        },
+      })
+      let listItemsArr = []
+      listItems.map(item => {
+        listItemsArr.push(item.ItemId)
+      })
+      if (listItems.length >= 20) {
+        return res.json({ status: 'error', message: '菜單項目已達上限' })
+      }
+      if (listItemsArr.includes(ItemId)) {
+        return res.json({ status: 'error', message: '此項目已在此菜單中' })
+      }
+      const newListItem = await ListItem.create({
+        ListId,
+        ItemId,
+        reps: '',
+        remark: '',
+        UserId: req.user.id,
+        sort: 1000,
+      })
+      return res.json(newListItem)
+    } catch (err) {
+      return res.json(err)
+    }
+  },
 }
 
 module.exports = listController

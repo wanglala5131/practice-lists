@@ -54,6 +54,7 @@ router.patch('/practice/lists/:id', authenticated, listController.listStatus)
 router.delete('/practice/lists/:id', authenticated, listController.deleteList)
 router.delete('/practice/lists/:id/:itemId', authenticated, listController.deleteListItem)
 router.put('/practice/lists/:id',authenticated,listController.putList)
+router.post('/practice/lists/:id/additem',authenticated,listController.addItemToList)
 
 
 module.exports = router
