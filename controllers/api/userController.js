@@ -33,7 +33,9 @@ const userController = {
     }
     // 簽發 token
     let payload = { id: user.id }
-    let token = await jwt.sign(payload, process.env.JWT_SECRET)
+    let token = await jwt.sign(payload, process.env.JWT_SECRET, {
+      expiresIn: '7 days',
+    })
     return res.json({
       status: 'success',
       token,
