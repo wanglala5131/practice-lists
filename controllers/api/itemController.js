@@ -172,7 +172,12 @@ const itemController = {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
       //處理Subcategory
-      const newSubArr = subcategoriesArr.map(Number)
+      let newSubArr = []
+      if (typeof subcategoriesArr === 'string') {
+        newSubArr.push(Number(subcategoriesArr))
+      } else {
+        subcategoriesArr.map(id => newSubArr.push(Number(id)))
+      }
       const oriSubArr = []
       for (let subcategory of putItem.Subcategories) {
         await oriSubArr.push(subcategory.id)
