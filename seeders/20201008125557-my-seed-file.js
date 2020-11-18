@@ -161,7 +161,7 @@ module.exports = {
       {}
     )
     await queryInterface.bulkInsert(
-      'itemtypes',
+      'ItemTypes',
       [
         {
           id: 1,
@@ -213,7 +213,7 @@ module.exports = {
     await queryInterface.bulkDelete('Users', null, {})
     await queryInterface.bulkDelete('Categories', null, {})
     await queryInterface.bulkDelete('Subcategories', null, {})
-    await queryInterface.bulkDelete('items', null, {})
-    await queryInterface.bulkDelete('itemtypes', null, {})
+    await queryInterface.bulkDelete('Items', null, {})
+    await queryInterface.bulkDelete('ItemTypes', null, {})
   },
 }
