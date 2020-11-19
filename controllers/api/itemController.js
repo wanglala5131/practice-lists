@@ -4,7 +4,8 @@ const Subcategory = db.Subcategory
 const Category = db.Category
 const ItemType = db.ItemType
 const Cart = db.Cart
-const fs = require('fs')
+const imgur = require('imgur-node-api')
+const IMGUR_CLIENT_ID = process.env.IMGUR_CLIENT_ID
 
 const itemController = {
   getItems: async (req, res) => {
@@ -97,17 +98,31 @@ const itemController = {
       if (!name || !CategoryId || subcategoriesArr.length === 0) {
         return res.json({ status: 'error', message: '必填欄位要記得填喔！' })
       }
+      //若傳來的subcategory只有一項，會變成字串
+      let subcategories = []
+      if (typeof subcategoriesArr === 'string') {
+        subcategories.push(Number(subcategoriesArr))
+      } else {
+        subcategoriesArr.map(id => subcategories.push(Number(id)))
+      }
       const { file } = req
+      if (file.mimetype !== 'image/jpeg') {
+        return res.json({
+          status: 'error',
+          message: '只能傳送圖片格式，例如png、jepg等',
+        })
+      }
       if (file) {
-        fs.readFile(file.path, (err, data) => {
-          if (err) {
-            return res.json({ message: 'error' })
-          }
-          fs.writeFile(`upload/${file.originalname}`, data, async () => {
+        imgur.setClientID(IMGUR_CLIENT_ID)
+        imgur.upload(file.path, async (err, img) => {
+          try {
+            if (err) {
+              return res.json({ message: 'error' })
+            }
             const newItem = await Item.create({
               name,
               description,
-              image: `/upload/${file.originalname}`,
+              image: img.data.link,
               CategoryId,
               limit,
               UserId,
@@ -115,14 +130,16 @@ const itemController = {
               isLiked: false,
             })
             const ItemId = await newItem.id
-            for (let subcategory of subcategoriesArr) {
+            for (let subcategory of subcategories) {
               await ItemType.create({
                 ItemId,
                 SubcategoryId: Number(subcategory),
               })
             }
             return res.json({ newItem })
-          })
+          } catch (error) {
+            return res.json(error)
+          }
         })
       } else {
         const newItem = await Item.create({
@@ -136,7 +153,7 @@ const itemController = {
           isLiked: false,
         })
         const ItemId = await newItem.id
-        for (let subcategory of subcategoriesArr) {
+        for (let subcategory of subcategories) {
           await ItemType.create({
             ItemId,
             SubcategoryId: Number(subcategory),
@@ -214,25 +231,30 @@ const itemController = {
         }
       }
       const { file } = req
+      if (file.mimetype !== 'image/jpeg') {
+        return res.json({
+          status: 'error',
+          message: '只能傳送圖片格式，例如png、jepg等',
+        })
+      }
       if (file) {
-        fs.readFile(file.path, (err, data) => {
+        imgur.setClientID(IMGUR_CLIENT_ID)
+        imgur.upload(file.path, async (err, img) => {
           if (err) {
             return res.json({ message: 'error' })
           }
-          fs.writeFile(`upload/${file.originalname}`, data, async () => {
-            try {
-              const updateItem = await putItem.update({
-                name,
-                description,
-                image: `/upload/${file.originalname}`,
-                CategoryId,
-                limit,
-              })
-              return res.json({ status: 'success', updateItem })
-            } catch (err) {
-              return res.json(err)
-            }
-          })
+          try {
+            const updateItem = await putItem.update({
+              name,
+              description,
+              image: img.data.link,
+              CategoryId,
+              limit,
+            })
+            return res.json({ status: 'success', updateItem })
+          } catch (err) {
+            return res.json(err)
+          }
         })
       } else {
         const updateItem = await putItem.update({
