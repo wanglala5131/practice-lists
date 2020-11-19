@@ -11,9 +11,6 @@ const listController = require('../controllers/api/listController')
 
 const authenticated = passport.authenticate('jwt', { session: false })
 
-
-//test
-router.get('/practice/test',itemController.testRoute)
 //user
 router.post('/practice/signin', userController.signIn)
 router.post('/practice/signup', userController.signUp)
