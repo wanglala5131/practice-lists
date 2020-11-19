@@ -323,6 +323,21 @@ const itemController = {
       res.json(err)
     }
   },
+  testRoute: async (req, res) => {
+    try {
+      const userId = 1
+      const items = await Item.findAll({
+        where: {
+          userId,
+          isClosed: false,
+        },
+        include: [Category, { model: Subcategory, as: 'Subcategories' }],
+      })
+      return res.json(items)
+    } catch (err) {
+      return res.json(err)
+    }
+  },
 }
 
 module.exports = itemController
