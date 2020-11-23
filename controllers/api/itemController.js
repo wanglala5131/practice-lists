@@ -236,7 +236,7 @@ const itemController = {
       if (!filetype.includes(file.mimetype)) {
         return res.json({
           status: 'error',
-          message: '只能傳送圖片格式，例如png、jepg等',
+          message: '只能傳送圖片格式，例如png、jepg',
         })
       }
       if (file) {
