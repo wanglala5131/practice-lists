@@ -345,6 +345,30 @@ const itemController = {
       res.json(err)
     }
   },
+  deleteItemImage: async (req, res) => {
+    try {
+      const ItemId = Number(req.params.id)
+      const putItem = await Item.findOne({
+        where: {
+          id: ItemId,
+          UserId: req.user.id,
+        },
+        include: [{ model: Subcategory, as: 'Subcategories' }],
+      })
+      if (!putItem) {
+        return res.json({ status: 'error', message: '找不到此項目資訊' })
+      }
+      if (!putItem.image) {
+        return res.json({ status: 'error', message: '此項目已經沒有照片' })
+      }
+      await putItem.update({
+        image: '',
+      })
+      return res.json({ status: 'success', data: putItem })
+    } catch (err) {
+      return res.json(err)
+    }
+  },
 }
 
 module.exports = itemController
