@@ -106,7 +106,8 @@ const itemController = {
         subcategoriesArr.map(id => subcategories.push(Number(id)))
       }
       const { file } = req
-      if (file.mimetype !== 'image/jpeg') {
+      const filetype = ['image/jpeg', 'image/png']
+      if (!filetype.includes(file.mimetype)) {
         return res.json({
           status: 'error',
           message: '只能傳送圖片格式，例如png、jepg等',
@@ -231,7 +232,8 @@ const itemController = {
         }
       }
       const { file } = req
-      if (file.mimetype !== 'image/jpeg') {
+      const filetype = ['image/jpeg', 'image/png']
+      if (!filetype.includes(file.mimetype)) {
         return res.json({
           status: 'error',
           message: '只能傳送圖片格式，例如png、jepg等',
