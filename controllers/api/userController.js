@@ -112,6 +112,9 @@ const userController = {
       return res.json(err)
     }
   },
+  test: (req, res) => {
+    return res.json({ status: 'success' })
+  },
 }
 
 module.exports = userController
